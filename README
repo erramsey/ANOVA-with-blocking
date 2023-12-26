@@ -1,0 +1,5 @@
+This code is for a one-way ANOVA with blocking performed using the CLASS dataset from the SASHELP library. 
+This is a fictitious dataset for a small class of students that includes the variables sex, age, height, and weight. 
+The ANOVA analyzes the difference in weight between age groups while using sex as a blocking variable.
+
+Coding was performed in SAS Studio.
