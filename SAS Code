@@ -1,0 +1,53 @@
+DATA CLASS;
+    SET sashelp.CLASS;
+    
+*Examining descriptive statistics of the data;
+PROC CONTENTS DATA=class;
+PROC MEANS DATA=class;
+PROC FREQ DATA=class;    
+ 
+*Creating a means plot to compare the mean weight of the different age groups;
+*Results suggest that the means vary significantly by age;
+PROC SORT DATA=class; BY age;
+PROC MEANS DATA=class;
+  VAR weight; BY age;
+  OUTPUT OUT=means MEAN=average;
+  GOPTIONS reset=all;
+  SYMBOL v=circle c=blue h=.8 i=join;
+PROC GPLOT DATA=means;
+  PLOT average*age/frame;
+RUN;    
+
+*Creating a boxplot of weight for each sex;
+*Results suggest that the mean and variation of weight vary greatly by sex;
+PROC SORT DATA=class;
+    BY sex;
+RUN;
+PROC BOXPLOT DATA=class;
+    PLOT weight*sex;
+    INSET min mean max stddev/pos = tm;
+    INSETGROUP min mean max stddev ;
+RUN;        
+
+*Creating a scatterplot of weight for each age, grouped by sex;
+*Results suggest that weight varies by age for each sex;
+PROC SGPLOT DATA = class;
+    SCATTER x=age y=weight / group=sex;
+RUN;
+ 
+*Performing ANOVA with sex as a blocking variable; 
+*Results are significant, suggesting that the mean weight is different for at least two age groups;
+PROC GLM DATA = class plots = all;
+   CLASS age sex;
+   MODEL weight = age sex;
+   LSMEANS age;
+RUN;
+
+*Performing Tukey, Scheffe, and Bonferroni analysis to determine which age groups differ significantly from one another;
+*Results suggest that ages 16 and 13, 16 and 11, 15 and 11 are significantly different;
+PROC GLM DATA = class plots = all;
+   CLASS age sex;
+   MODEL weight = age sex;
+   MEANS age sex/ tukey scheffe bon; 
+  OUTPUT out=temp r=resid;
+RUN;
